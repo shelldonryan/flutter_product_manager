@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import '../interfaces/auth_repository_interface.dart';
 import '../interfaces/http_client_interface.dart';
 
@@ -33,11 +32,7 @@ class UserRepository implements IAuthRepository{
       'type': type
     });
 
-    if (kDebugMode) {
-      print(response);
-    }
-
-    if (!response[0].containsKey('success')) {
+    if (!response.containsKey('success')) {
       throw Exception('Failed to register: $response');
     }
   }

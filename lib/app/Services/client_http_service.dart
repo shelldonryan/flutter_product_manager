@@ -13,7 +13,7 @@ class ClientHttpService implements IHttpClient {
       headers['Authorization'] = 'Bearer $_token';
     }
 
-    final response = await httpClient.post(Uri.parse(url), headers: headers);
+    final response = await httpClient.get(Uri.parse(url), headers: headers);
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);

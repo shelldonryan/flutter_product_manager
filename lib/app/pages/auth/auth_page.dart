@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_manager_product/app/Services/client_http_service.dart';
+import 'package:flutter_manager_product/app/interfaces/http_client_interface.dart';
 import 'package:flutter_manager_product/app/repositories/user_repository.dart';
 import 'package:flutter_manager_product/app/store/auth_store.dart';
+import 'package:provider/provider.dart';
 import '../../utils/decoration_field_auth.dart';
 import '../../utils/my_colors.dart';
 import '../home/home_page.dart';
@@ -20,13 +21,6 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   @override
   void initState() {
     super.initState();
-    _authController = AuthController(
-        AuthStore(
-          UserRepository(
-            ClientHttpService(),
-          ),
-        ),
-    );
   }
 
   @override
@@ -87,6 +81,14 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
 
   @override
   Widget build(BuildContext context) {
+    _authController = AuthController(
+      AuthStore(
+        UserRepository(
+          context.watch<IHttpClient>(),
+        ),
+      ),
+    );
+
     return ValueListenableBuilder(
       valueListenable: _authController.isNotSigned,
       builder:(context, isNotSigned, child) => Scaffold(

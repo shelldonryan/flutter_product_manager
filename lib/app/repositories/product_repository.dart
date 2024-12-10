@@ -1,26 +1,40 @@
+import 'package:flutter_manager_product/app/interfaces/http_client_interface.dart';
+
 import '../interfaces/product_repository_interface.dart';
 import '../models/product.dart';
 
 class ProductRepository implements IProductRepository{
-
-
-  final List<Product> products = [
-    Product(id: '1', name: 'Maracujá', quantity: 240, price: 1.45),
-    Product(id: '2', name: 'Uva', quantity: 200, price: 3.45),
-    Product(id: '3', name: 'Laranja', quantity: 560, price: 2.35),
-    Product(id: '4', name: 'Banana', quantity: 240, price: 4.00),
-    Product(id: '5', name: 'Abacaxi', quantity: 240, price: 7.80),
-  ];
+  final IHttpClient httpClient;
+  
+  ProductRepository(this.httpClient);
 
   @override
-  Future<void> create() async {
+  Future<void> create(String productName, int quantity, double price) async {
+    final response = await httpClient.post("http://10.0.2.2:5001/api/product/create",
+        {
+          "name": productName,
+          "quantity": quantity,
+          "price": price
+        });
+
+    if(!response.containsKey('success')) {
+      throw Exception('Failed to create product: $response');
+    }
   }
 
   @override
-  Future<void> getAll() async {
+  Future<List<Product>> getAll() async {
+    final response = await httpClient.get("http://10.0.2.2:5001/api/product/getByUser");
 
+    List<Product> products = [];
+
+    if (response['status'] == 'suceeded') {
+      for (Map<String, dynamic> i in response['data']) {
+        products.add(Product.fromMap(i));
+      }
+    }
+
+    return products;
   }
-
-
 }
 

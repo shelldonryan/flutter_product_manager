@@ -5,22 +5,19 @@ class Product {
   final String name;
   final int quantity;
   final double price;
-  final String? userId;
 
   Product(
       {required this.id,
       required this.name,
       required this.quantity,
-      required this.price,
-      this.userId});
+      required this.price,});
 
   factory Product.fromMap(Map<String, dynamic> map) {
     return Product(
         id: map['id'] ?? '',
         name: map['name'] ?? '',
-        quantity: map['quantity'] ?? 0,
-        price: map['price'] ?? 0.00,
-        userId: map['userId'] ?? '');
+        quantity: int.parse(map['quantity'].toString()),
+        price: double.parse(map['price'].toString()));
   }
 
   factory Product.fromJson(String jsonString) =>
@@ -31,7 +28,6 @@ class Product {
      'name': name,
      'quantity': quantity,
      'price': price,
-     'userId': userId,
   };
 
   String toJson() => json.encode(toMap());

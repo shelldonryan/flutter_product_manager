@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_manager_product/app/pages/home/home_controller.dart';
+import 'package:flutter_manager_product/app/store/product_store.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../../interfaces/http_client_interface.dart';
 import '../../repositories/product_repository.dart';
 import '../../utils/my_colors.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,16 +17,24 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   NumberFormat real = NumberFormat.currency(locale: 'pt_BR', name: 'R\$');
-  late final ProductRepository productRepository;
+  late final HomeController _homeController;
 
   @override
   void initState() {
     super.initState();
-    productRepository = ProductRepository();
   }
 
   @override
   Widget build(BuildContext context) {
+    _homeController = HomeController(
+      ProductStore(
+        ProductRepository(
+          context.watch<IHttpClient>(),
+        ),
+      ),
+    );
+    _homeController.getAllProducts();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -49,7 +62,6 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-            const SizedBox(height: 20,),
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text("logout"),
@@ -58,23 +70,30 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: Container(
-        padding: const EdgeInsets.all(10),
-        child: ListView.builder(
-            itemCount: productRepository.products.length,
-            itemBuilder: (context, index) {
-              final product = productRepository.products[index];
-              return Card(
-                color: Colors.white,
-                borderOnForeground: true,
-                elevation: 1,
-                child: ListTile(
-                  title: Text(product.name),
-                  subtitle: Text(product.quantity.toString()),
-                  trailing: Text(real.format(product.price)),
+      body: Observer(
+        builder: (_) => Container(
+          padding: const EdgeInsets.all(10),
+          child: _homeController.products.isEmpty
+              ? const Center(
+                  child: Text('No products available'),
+                )
+              : ListView.builder(
+                  itemCount: _homeController.products.length,
+                  itemBuilder: (context, index) {
+                    final product = _homeController.products[index];
+                    return Card(
+                      color: Colors.white,
+                      borderOnForeground: true,
+                      elevation: 1,
+                      child: ListTile(
+                        title: Text(product.name),
+                        subtitle: Text('Quantity: ${product.quantity}'),
+                        trailing: Text(real.format(product.price)),
+                      ),
+                    );
+                  },
                 ),
-              );
-            }),
+        ),
       ),
     );
   }

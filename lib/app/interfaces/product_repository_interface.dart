@@ -1,4 +1,4 @@
 abstract class IProductRepository {
   Future getAll();
-  Future create();
+  Future create(String productName, int quantity, double price);
 }
